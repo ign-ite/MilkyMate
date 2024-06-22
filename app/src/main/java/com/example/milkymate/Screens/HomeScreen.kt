@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -42,50 +43,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberImagePainter
 import com.example.milkymate.Data.User
 import com.example.milkymate.ui.theme.MilkyMateTheme
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 
-data class BottomNavigationItem(
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val hasNews: Boolean,
-    val badgeCount: Int? = null
-)
 
-val items = listOf(
-BottomNavigationItem(
-title ="Home",
-selectedIcon = Icons.Filled.Home,
-unselectedIcon = Icons.Outlined.Home,
-hasNews = false
-),
-BottomNavigationItem(
-title ="Products",
-selectedIcon = Icons.Filled.Menu,
-unselectedIcon = Icons.Outlined.Menu,
-hasNews = false
-),
-BottomNavigationItem(
-title ="Home",
-selectedIcon = Icons.Filled.Home,
-unselectedIcon = Icons.Outlined.Home,
-hasNews = false
-),
-BottomNavigationItem(
-title ="Profile",
-selectedIcon = Icons.Filled.Person,
-unselectedIcon = Icons.Outlined.Person,
-hasNews = false
-),
-)
 
 @Composable
-fun HomeScreen(navController: NavController, user: User) {
+fun HomeScreen(navController: NavController,
+               user: User) {
     MilkyMateTheme {
 
 
@@ -94,6 +67,7 @@ fun HomeScreen(navController: NavController, user: User) {
                 topBar = { TopAppBar() },
                 bottomBar = { BottomNavigationBar(navController= navController) }
             ) { innerPadding ->
+                BottomNavGraph(navController = navController)
                 HomeScreenContent(
                     navController = navController,
                     user = user,
@@ -118,12 +92,27 @@ fun BottomNavigationBar(navController: NavController) {
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }
+    val screens = listOf(
+        BottomBarScreen.Home,
+        BottomBarScreen.Orders,
+        BottomBarScreen.Profile,
+        BottomBarScreen.Products
+    )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
         NavigationBar {
         items.forEachIndexed{index , item->
             NavigationBarItem(
                 selected = selectedItemIndex==index,
                 onClick = {selectedItemIndex= index
-                    navigateToDestination(index = index, navController = navController)
+                    when (index) {
+                        0 -> navController.navigate("HomeScreen")
+                        1 -> navController.navigate("ProductsScreen")
+                        2 -> navController.navigate("OrdersScreen")
+                        3 -> navController.navigate("ProfileScreen")
+                    }
                           },
                 label = {
                     Text(item.title)
@@ -154,15 +143,15 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-
-private fun navigateToDestination(index: Int, navController: NavController) {
-    when (index) {
-        0 -> navController.navigate("HomeScreen")
-        1 -> navController.navigate("ProductsScreen")
-        2 -> navController.navigate("OrdersScreen")
-        3 -> navController.navigate("ProfileScreen")
-    }
+@Composable
+fun RowScope.AddItem(
+    screen: BottomBarScreen,
+    currentDestination: NavDestination?,
+    navController= NavHostController
+) {
+    BottomNavigationItem()
 }
+
 
 
 @Composable

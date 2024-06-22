@@ -47,15 +47,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    composable("ProductsScreen") {
-                        ProductsScreen(navController = navController)
-                    }
-                    composable("OrdersScreen") {
-                        OrdersScreen(navController = navController)
-                    }
-                    composable("ProfileScreen") {
-                        ProfileScreen(navController = navController)
-                    }
+
 
                 }
 

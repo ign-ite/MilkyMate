@@ -1,5 +1,6 @@
 package com.example.milkymate.Data
 
+
 import kotlinx.serialization.Serializable
 
 @Serializable

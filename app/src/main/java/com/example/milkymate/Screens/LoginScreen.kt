@@ -201,6 +201,8 @@ private fun PotraitLoginScreen(
                             Button(
                                 onClick = {
                                     launcher.launch(googleSignInClient.signInIntent)
+
+
                                 },
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier.width(200.dp),

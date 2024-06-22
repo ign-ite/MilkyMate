@@ -1,79 +1,112 @@
 package com.example.milkymate.Screens
 
-import android.media.Image
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.Badge
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
+ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.example.milkymate.Data.User
 import com.example.milkymate.ui.theme.MilkyMateTheme
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 
 
 
+
+
 @Composable
-fun HomeScreen(navController: NavController,
-               user: User) {
+fun HomeScreen(navController: NavController, user: User) {
     MilkyMateTheme {
+        var selectedItemIndex by rememberSaveable {
+            mutableStateOf(0)
+        }
 
+        val screens = listOf(
+            BottomBarScreen.Home,
+            BottomBarScreen.Products,
+            BottomBarScreen.Orders,
+            BottomBarScreen.Profile
+        )
 
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Scaffold(
-                topBar = { TopAppBar() },
-                bottomBar = { BottomNavigationBar(navController= navController) }
-            ) { innerPadding ->
-                BottomNavGraph(navController = navController)
-                HomeScreenContent(
-                    navController = navController,
-                    user = user,
-                    modifier = Modifier.padding(innerPadding)
-                )
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination?.route
+        val navController = rememberNavController()
+        Scaffold(
+            topBar = { TopAppBar() },
+            bottomBar = {
+                NavigationBar {
+                    screens.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = currentDestination == item.route,
+                            onClick = {
+                                selectedItemIndex = index
+                                when (index) {
+                                    0 -> navController.navigate("HomeScreen")
+                                    1 -> navController.navigate("ProductsScreen")
+                                    2 -> navController.navigate("OrdersScreen")
+                                    3 -> navController.navigate("ProfileScreen")
+                                }
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            label = { Text(item.title) },
+                            icon = {
+                                BadgedBox(
+                                    badge = {
+                                        if (item.badgeCount != null) {
+                                            // Show badge with count
+                                            Text(item.badgeCount.toString())
+                                        } else if (item.hasNews) {
+                                            // Show empty badge for news
+                                            Text(" ")
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = if (currentDestination == item.route) {
+                                            item.selectedIcon
+                                        } else {
+                                            item.unselectedIcon
+                                        },
+                                        contentDescription = item.title
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
             }
+
+        ) { innerPadding ->
+            HomeScreenContent(
+                navController = navController,
+                user = user,
+                modifier = Modifier.padding(innerPadding)
+            )
+            BottomNavGraph(navController = navController, user =user)
         }
     }
 }
@@ -82,89 +115,30 @@ fun HomeScreen(navController: NavController,
 @Composable
 fun TopAppBar() {
     // Define your top app bar here
-    CenterAlignedTopAppBar(
-        title = { Text("MilkyMate") }
-    )
-}
-
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    var selectedItemIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
-    val screens = listOf(
-        BottomBarScreen.Home,
-        BottomBarScreen.Orders,
-        BottomBarScreen.Profile,
-        BottomBarScreen.Products
-    )
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-
-        NavigationBar {
-        items.forEachIndexed{index , item->
-            NavigationBarItem(
-                selected = selectedItemIndex==index,
-                onClick = {selectedItemIndex= index
-                    when (index) {
-                        0 -> navController.navigate("HomeScreen")
-                        1 -> navController.navigate("ProductsScreen")
-                        2 -> navController.navigate("OrdersScreen")
-                        3 -> navController.navigate("ProfileScreen")
-                    }
-                          },
-                label = {
-                    Text(item.title)
-                },
-                alwaysShowLabel = false,
-                icon={
-                    BadgedBox(
-                        badge = {
-                            if(item.badgeCount!= null){
-                                Badge(content = {Text(item.badgeCount.toString())})
-                            }else if( item.hasNews){
-                                Badge()
-                            }
-
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if(index == selectedItemIndex){
-                                item.selectedIcon
-                            } else item.unselectedIcon,
-                            contentDescription = item.title
-                        )
-                    }
-
-                }
-            )
-        }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("MilkyMate", fontSize = 24.sp)
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
-@Composable
-fun RowScope.AddItem(
-    screen: BottomBarScreen,
-    currentDestination: NavDestination?,
-    navController= NavHostController
-) {
-    BottomNavigationItem()
-}
-
-
 
 @Composable
 fun HomeScreenContent(navController: NavController, user: User, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // here all these texts need to go to the top app bar
         Text(text = "Welcome, ${user.displayName}!", fontSize = 24.sp)
+        Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Email: ${user.email}", fontSize = 16.sp)
+        Spacer(modifier = Modifier.height(16.dp))
         user.photoUrl?.let { url ->
             Image(
                 painter = rememberImagePainter(url),
@@ -175,6 +149,7 @@ fun HomeScreenContent(navController: NavController, user: User, modifier: Modifi
                 contentScale = ContentScale.Crop
             )
         }
+        Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
             Firebase.auth.signOut()
             navController.navigate("LoginScreen") {
@@ -183,9 +158,7 @@ fun HomeScreenContent(navController: NavController, user: User, modifier: Modifi
                 }
             }
         }) {
-            Text("Sign Out", fontSize = 16.sp)
+            Text(text = "Sign Out", fontSize = 16.sp)
         }
     }
 }
-
-

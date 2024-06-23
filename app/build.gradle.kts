@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 
     id ("kotlin-parcelize")
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 
 }
 
@@ -92,4 +94,13 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.navigation.compose)
+
+    implementation(libs.arrow.core)
+    implementation(libs.arrow.fx.coroutines)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+
 }

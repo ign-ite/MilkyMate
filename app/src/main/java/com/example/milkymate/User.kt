@@ -1,4 +1,4 @@
-package com.example.milkymate.Data
+package com.example.milkymate
 
 
 import kotlinx.serialization.Serializable

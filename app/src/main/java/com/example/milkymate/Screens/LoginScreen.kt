@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.milkymate.Data.User
+import com.example.milkymate.User
  import com.example.milkymate.R
 import com.example.milkymate.ui.theme.dimens
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -130,6 +130,7 @@ private fun PotraitLoginScreen(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Image(
                     painter = painterResource(R.drawable.logo),
                     contentDescription = "Logo",

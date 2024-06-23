@@ -1,4 +1,4 @@
-package com.example.milkymate.Screens
+package com.example.milkymate.ui.theme
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp

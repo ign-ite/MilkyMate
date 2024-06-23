@@ -16,11 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import com.example.milkymate.MainActivity
-import com.example.milkymate.Screens.CompactDimens
-import com.example.milkymate.Screens.CompactMediumDimens
-import com.example.milkymate.Screens.CompactSmallDimens
-import com.example.milkymate.Screens.ExpandedDimens
-import com.example.milkymate.Screens.MediumDimens
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF6200EA),

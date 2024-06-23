@@ -1,4 +1,4 @@
-package com.example.milkymate.Screens
+package com.example.milkymate.Store.presentation.UI
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

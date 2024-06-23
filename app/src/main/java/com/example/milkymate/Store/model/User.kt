@@ -1,4 +1,4 @@
-package com.example.milkymate
+package com.example.milkymate.Store.model
 
 
 import kotlinx.serialization.Serializable

@@ -1,4 +1,4 @@
-package com.example.milkymate.Screens
+package com.example.milkymate.Store.presentation.UI
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -17,8 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
-import com.example.milkymate.HomeScreenViewModel
-import com.example.milkymate.User
+import com.example.milkymate.Store.presentation.UI.Viewmodels.HomeScreenViewModel
+import com.example.milkymate.Store.model.User
 import com.example.milkymate.ui.theme.MilkyMateTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase

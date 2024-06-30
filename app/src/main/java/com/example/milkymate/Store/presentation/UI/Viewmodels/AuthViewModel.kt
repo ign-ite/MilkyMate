@@ -1,36 +1,22 @@
-package com.example.milkymate.Store.presentation.UI.Viewmodels
-
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavHostController
 import com.example.milkymate.Store.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.net.URLEncoder
 
-
-
 class AuthViewModel : ViewModel() {
-
-
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
-
-    private val _isSuccess = MutableLiveData<Boolean>()
-    val isSuccess: LiveData<Boolean> get() = _isSuccess
-
-    private val _isError = MutableLiveData<String>()
-    val isError: LiveData<String> get() = _isError
-
-
     private lateinit var navController: NavController
+    private val _shouldNavigateToHome = MutableStateFlow<User?>(null)
+    val shouldNavigateToHome: StateFlow<User?> = _shouldNavigateToHome.asStateFlow()
 
     fun setNavController(navController: NavController) {
         this.navController = navController
@@ -39,34 +25,28 @@ class AuthViewModel : ViewModel() {
     fun loginWithGoogle(idToken: String) {
         val auth = FirebaseAuth.getInstance()
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        _isLoading.value = true
         auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
-            _isLoading.value = false
             if (authResult.isSuccessful) {
                 val firebaseUser = auth.currentUser
-                val user = firebaseUser?.uid?.let {
+                val user = firebaseUser?.let {
                     User(
-                        displayName = firebaseUser?.displayName,
-                        photoUrl = firebaseUser?.photoUrl?.toString(),
-                        email = firebaseUser?.email,
-                        uid = it
+                        displayName = it.displayName ?: "",
+                        photoUrl = it.photoUrl?.toString() ?: "",
+                        email = it.email ?: "",
+                        uid = it.uid
                     )
                 }
-                val userJson = URLEncoder.encode(Json.encodeToString(user), "UTF-8")
-                // Navigate to home screen or handle success state here
-                _isSuccess.value = true
-                navigationToHomeScreen(navController, user.toString())//
+                if (user != null) {
+                    _shouldNavigateToHome.value = user
+                }
             } else {
-                _isError.value = "Authentication failed."
+                // Handle error
             }
         }
     }
 
-    private fun navigationToHomeScreen(navController: NavController,user:String){
-        GlobalScope.launch { Dispatchers.Main }
-
-        navController.navigate("HomeScreen/$user")//
+    fun navigateToHomeScreen(user: User) {
+        val userJson = URLEncoder.encode(Json.encodeToString(user), "UTF-8")
+        navController.navigate("HomeScreen/$userJson")
     }
-
-
 }

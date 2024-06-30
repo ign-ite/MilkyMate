@@ -1,5 +1,6 @@
 package com.example.milkymate.Store.presentation.UI
 
+import AuthViewModel
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.widget.Toast
@@ -15,8 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.milkymate.Store.presentation.UI.Viewmodels.AuthViewModel
 import com.example.milkymate.R
 import com.example.milkymate.ui.theme.dimens
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -41,9 +43,8 @@ import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun LoginScreen(
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
 ) {
-
     val navController = rememberNavController()
     authViewModel.setNavController(navController)
     val context = LocalContext.current
@@ -80,7 +81,6 @@ private fun PotraitLoginScreen(
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
     googleSignInClient: GoogleSignInClient
 ) {
-    val isLoading by viewModel<AuthViewModel>().isLoading.observeAsState(false)
     val font1 = FontFamily(Font(R.font.font1))
     val font2 = FontFamily(Font(R.font.font2))
     val font3 = FontFamily(Font(R.font.font3))
@@ -103,7 +103,6 @@ private fun PotraitLoginScreen(
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .size(310.dp)
-
                 )
                 Spacer(modifier = Modifier.padding(MaterialTheme.dimens.medium1))
 
@@ -167,8 +166,6 @@ private fun PotraitLoginScreen(
                             Button(
                                 onClick = {
                                     launcher.launch(googleSignInClient.signInIntent)
-
-
                                 },
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier.width(200.dp),
@@ -199,5 +196,3 @@ private fun PotraitLoginScreen(
         }
     )
 }
-
-

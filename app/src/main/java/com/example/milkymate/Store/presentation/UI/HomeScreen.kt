@@ -1,5 +1,3 @@
-package com.example.milkymate.Store.presentation.UI
-
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -10,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
- import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,15 +21,9 @@ import com.example.milkymate.ui.theme.MilkyMateTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-
-
-
-
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(navController: NavController, user: User, viewModel: HomeScreenViewModel = viewModel()) {
-    // Set the user in the ViewModel
     LaunchedEffect(user) {
         viewModel.setUser(user)
     }
@@ -79,7 +71,7 @@ fun HomeScreenContent(navController: NavController, viewModel: HomeScreenViewMod
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            user.photoUrl?.let { url ->
+            user.photoUrl.let { url ->
                 Image(
                     painter = rememberImagePainter(
                         data = url,

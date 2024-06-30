@@ -1,29 +1,37 @@
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
+import com.example.milkymate.Nav.NavItem
 import com.example.milkymate.Store.presentation.UI.Viewmodels.HomeScreenViewModel
 import com.example.milkymate.Store.model.User
+import com.example.milkymate.Store.presentation.UI.NavigationScreens
 import com.example.milkymate.ui.theme.MilkyMateTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavController, user: User, viewModel: HomeScreenViewModel = viewModel()) {
+fun HomeScreen(navController: NavController, user: User, viewModel: HomeScreenViewModel = viewModel() , viewModelStoreOwner: ViewModelStoreOwner) {
     LaunchedEffect(user) {
         viewModel.setUser(user)
     }
@@ -36,17 +44,49 @@ fun HomeScreen(navController: NavController, user: User, viewModel: HomeScreenVi
                 },
                 content = {
                     HomeScreenContent(navController = navController, viewModel = viewModel)
-                }
+                },
+                bottomBar = {
+                    BottomAppBar { BottomNavigationBar(navController = navController) }
+                }) { NavigationScreens(navController = navController, viewModelStoreOwner = viewModelStoreOwner) }
+
             )
         }
     }
 }
 
 @Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    val navItems = listOf(NavItem.Home, NavItem.Products, NavItem.History, NavItem.Profile)
+    var selectedItem by rememberSaveable { mutableStateOf(0) }
+
+    NavigationBar {
+        navItems.forEachIndexed { index, item ->
+            NavigationBarItem(
+                alwaysShowLabel = true,
+                icon = { Icon(item.icon, contentDescription = item.title) },
+                label = { Text(item.title) },
+                selected = selectedItem == index,
+                onClick = {
+                    selectedItem = index
+                    navController.navigate(item.path) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) { saveState = true }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
+
+@Composable
 fun TopAppBarContent(viewModel: HomeScreenViewModel) {
     val user by viewModel.user.collectAsState()
     user?.let { user ->
-        Column(
+      /*  Column(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
@@ -56,7 +96,7 @@ fun TopAppBarContent(viewModel: HomeScreenViewModel) {
             Text(text = "Welcome, ${user.displayName}!", fontSize = 24.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Email: ${user.email}", fontSize = 16.sp)
-        }
+       }*/
     }
 }
 

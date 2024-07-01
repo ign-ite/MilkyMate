@@ -1,6 +1,7 @@
 package com.example.milkymate.Store.presentation.UI
 
 import AuthViewModel
+import HomeScreen
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.widget.Toast
@@ -41,6 +42,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import kotlinx.serialization.json.Json
+import java.net.URLEncoder
 
 @Composable
 fun LoginScreen(
@@ -75,16 +78,20 @@ fun LoginScreen(
         }
     }
 
-    val authState by authViewModel.authState.observeAsState()
+  /*  val authState by authViewModel.authState.observeAsState()
 
     if (authState == AuthState.Authenticated) {
-        navController.navigate("home")
+
+       // HomeScreen(navController = navController, user = user, viewModel = viewModel())
+       // authViewModel.navigateToHomeScreen(navController=navController, user = )
 
     } else {
         PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient, navController = navController)
     }
 
-   // PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient,navController=navController)
+   */
+    PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient,navController=navController)
+
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

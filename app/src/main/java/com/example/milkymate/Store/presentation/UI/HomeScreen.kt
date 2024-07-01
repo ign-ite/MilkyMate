@@ -30,16 +30,18 @@ import com.google.firebase.ktx.Firebase
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavController,
-              user: User,
+fun HomeScreen(navController: NavController, user: User,
                viewModel: HomeScreenViewModel = viewModel() ) {
    LaunchedEffect(user) {
       viewModel.setUser(user)
    }
 
+
+
     MilkyMateTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             NavigationScreens(navController = navController ,user = user)
+
 
             Scaffold(
                 topBar = {

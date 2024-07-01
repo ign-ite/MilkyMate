@@ -13,24 +13,29 @@ import java.net.URLDecoder
 import android.util.Log
 import androidx.navigation.NavType
 import com.example.milkymate.Store.presentation.UI.LoginScreen
+import com.example.milkymate.Store.presentation.UI.SplashScreen
+import com.example.milkymate.Store.presentation.UI.Viewmodels.HomeScreenViewModel
+import kotlinx.serialization.encodeToString
+import java.net.URLEncoder
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
-    NavHost(navController = navController, startDestination = "LoginScreen") {
-        composable("LoginScreen") {
-            LoginScreen(authViewModel = authViewModel , navController =navController)
+    NavHost(navController = navController, startDestination = "SplashScreen") {
+        composable("SplashScreen") {
+            SplashScreen(navController=navController)
         }
-        composable(
-            route = "home/{displayName}/{email}/{photoUrl}/{uid}",
-            arguments = listOf(navArgument("displayName") { type = NavType.StringType },
-                navArgument("uid") { type = NavType.StringType },
-                        navArgument("email") { type = NavType.StringType },
-                        navArgument("photoUrl") { type = NavType.StringType }),
+        composable("LoginScreen") {
+            LoginScreen(authViewModel = authViewModel, navController = navController)
+        }
+        composable("HomeScreen/{user}",
+
+            arguments = listOf(navArgument("user") { type = NavType.StringType }),
             deepLinks = listOf(navDeepLink {
-                uriPattern = "android-app://androidx.navigation/home/{user}"
-            })
-        ) { backStackEntry ->
+                uriPattern = "android-app://androidx.navigation/HomeScreen/{user}"
+            }),
+
+        ) {  backStackEntry ->
             val userJson = backStackEntry.arguments?.getString("user")
             val user = userJson?.let {
                 try {
@@ -41,7 +46,9 @@ fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
                 }
             }
             if (user != null) {
-                HomeScreen(navController = navController, user = user, viewModel = viewModel())
+                navController.navigate("HomeScreen/${URLEncoder.encode(Json.encodeToString(user), "UTF-8")}")
+
+              //  HomeScreen(navController = navController, user = user, viewModel = viewModel())
             } else {
                 LaunchedEffect(Unit) {
                     Log.w("Navigation", "User is null, navigating back to LoginScreen")
@@ -52,6 +59,7 @@ fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
                     }
                 }
             }
+
         }
     }
 }

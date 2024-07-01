@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.milkymate.Store.model.User
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,13 +22,19 @@ class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var navController: NavController
     private val _shouldNavigateToHome = MutableStateFlow<User?>(null)
-    val shouldNavigateToHome: StateFlow<User?> = _shouldNavigateToHome.asStateFlow()
+
+   val shouldNavigateToHome: StateFlow<User?> = _shouldNavigateToHome.asStateFlow()
+
+    private val _userData = MutableLiveData<User>()
+    val userData: LiveData<User> = _userData
 
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
 
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
+
+
 
     init {
         auth.currentUser?.let { firebaseUser ->
@@ -66,7 +73,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    private fun com.google.firebase.auth.FirebaseUser.toUser(): User? {
+     fun com.google.firebase.auth.FirebaseUser.toUser(): User? {
         return email?.let {
             displayName?.let { it1 ->
                 photoUrl?.toString()?.let { it2 ->
@@ -84,9 +91,10 @@ class AuthViewModel : ViewModel() {
     fun navigateToHomeScreen(navController: NavController, user: User) {
         val userJson = Json.encodeToString(user)
         val encodedUserJson = Uri.encode(userJson)
-     //   val deepLinkUri = Uri.parse("android-app://androidx.navigation/home/$encodedUserJson")
-      //  navController.navigate(deepLinkUri)
+        val deepLinkUri = Uri.parse("android-app://androidx.navigation/HomeScreen/$encodedUserJson")
+        navController.navigate("HomeScreen/${URLEncoder.encode(Json.encodeToString(user), "UTF-8")}")
     }
+
 
 }
 

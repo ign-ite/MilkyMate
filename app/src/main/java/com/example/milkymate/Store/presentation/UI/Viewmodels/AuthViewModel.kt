@@ -1,3 +1,5 @@
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -14,39 +16,71 @@ import kotlinx.serialization.json.Json
 import java.net.URLEncoder
 
 class AuthViewModel : ViewModel() {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var navController: NavController
     private val _shouldNavigateToHome = MutableStateFlow<User?>(null)
     val shouldNavigateToHome: StateFlow<User?> = _shouldNavigateToHome.asStateFlow()
+
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
+
+    init {
+        auth.currentUser?.let { firebaseUser ->
+            _user.value = firebaseUser.toUser()
+        }
+    }
 
     fun setNavController(navController: NavController) {
         this.navController = navController
     }
 
     fun loginWithGoogle(idToken: String) {
-        val auth = FirebaseAuth.getInstance()
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
-            if (authResult.isSuccessful) {
-                val firebaseUser = auth.currentUser
-                val user = firebaseUser?.let {
+        viewModelScope.launch {
+            // val auth = FirebaseAuth.getInstance()
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
+                if (authResult.isSuccessful) {
+                    val firebaseUser = auth.currentUser
+                    val user = firebaseUser?.let {
+                        User(
+                            displayName = it.displayName ?: "",
+                            photoUrl = it.photoUrl?.toString() ?: "",
+                            email = it.email ?: "",
+                            uid = it.uid
+                        )
+                    }
+                    if (user != null) {
+                        _shouldNavigateToHome.value = user
+                    }
+                } else {
+                    // Handle error
+                }
+            }
+        }
+    }
+
+    private fun com.google.firebase.auth.FirebaseUser.toUser(): User? {
+        return email?.let {
+            displayName?.let { it1 ->
+                photoUrl?.toString()?.let { it2 ->
                     User(
-                        displayName = it.displayName ?: "",
-                        photoUrl = it.photoUrl?.toString() ?: "",
-                        email = it.email ?: "",
-                        uid = it.uid
+                        uid = uid,
+                        email = it,
+                        displayName = it1,
+                        photoUrl = it2
                     )
                 }
-                if (user != null) {
-                    _shouldNavigateToHome.value = user
-                }
-            } else {
-                // Handle error
             }
         }
     }
 
     fun navigateToHomeScreen(user: User) {
-        val userJson = URLEncoder.encode(Json.encodeToString(user), "UTF-8")
-        navController.navigate("HomeScreen/$userJson")
+        if (::navController.isInitialized) {
+            val userJson = Json.encodeToString(user)
+            val encodedUser = URLEncoder.encode(userJson, "UTF-8")
+            navController.navigate("HomeScreen/$encodedUser")
+        } else {
+            Log.e("AuthViewModel", "NavController not initialized")
+        }
     }
 }

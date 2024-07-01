@@ -8,6 +8,8 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
 
+   // id("androidx.navigation.safeargs")
+
 }
 
 android {
@@ -103,7 +105,22 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(kotlin("script-runtime"))
+    implementation (libs.kotlinx.serialization.json.v132)
 
 
 
+    // Kotlin
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+
+    // Feature module Support
+    implementation(libs.androidx.navigation.dynamic.features.fragment)
+
+    // Testing Navigation
+    androidTestImplementation(libs.androidx.navigation.testing)
+
+    // Jetpack Compose Integration
+    implementation(libs.androidx.navigation.compose.v253)
 }
+
+

@@ -72,14 +72,15 @@ fun LoginScreen(
         }
     }
 
-    PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient)
+    PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient,navController=navController)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun PotraitLoginScreen(
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    googleSignInClient: GoogleSignInClient
+    googleSignInClient: GoogleSignInClient,
+    navController: NavController
 ) {
     val font1 = FontFamily(Font(R.font.font1))
     val font2 = FontFamily(Font(R.font.font2))
@@ -166,6 +167,7 @@ private fun PotraitLoginScreen(
                             Button(
                                 onClick = {
                                     launcher.launch(googleSignInClient.signInIntent)
+
                                 },
                                 shape = RoundedCornerShape(20.dp),
                                 modifier = Modifier.width(200.dp),

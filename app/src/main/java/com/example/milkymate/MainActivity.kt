@@ -19,9 +19,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             MilkyMateTheme {
                 val authViewModel: AuthViewModel by viewModels()
-                val navController = rememberNavController() // Initialize NavHostController
+                val navController = rememberNavController()
 
-                Navigation(navController = navController, authViewModel = authViewModel) // Pass navController to Navigation
+                Navigation(navController = navController, authViewModel = authViewModel)
             }
         }
         window.decorView.systemUiVisibility = (

@@ -1,12 +1,12 @@
 package com.example.milkymate
 
 import AuthViewModel
-import Navigation
+import NavGraph
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 //import com.example.milkymate.Store.presentation.Navigation.Navigation
 //import com.example.milkymate.Store.presentation.UI.Viewmodels.AuthViewModel
@@ -17,11 +17,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+
             MilkyMateTheme {
-                val authViewModel: AuthViewModel by viewModels()
+                val authViewModel: AuthViewModel = viewModel()
                 val navController = rememberNavController()
 
-                Navigation(navController = navController, authViewModel = authViewModel)
+                NavGraph(navController = navController, authViewModel = authViewModel)
             }
         }
         window.decorView.systemUiVisibility = (

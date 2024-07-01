@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.volley)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.crashlytics.buildtools)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -121,6 +122,8 @@ dependencies {
 
     // Jetpack Compose Integration
     implementation(libs.androidx.navigation.compose.v253)
+
+    implementation( libs.navigation.compose.v253)
 }
 
 

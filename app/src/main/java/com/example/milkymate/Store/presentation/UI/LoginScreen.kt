@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,9 +45,11 @@ import com.google.android.gms.common.api.ApiException
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel = viewModel(),
+    navController: NavController
 ) {
-    val navController = rememberNavController()
     authViewModel.setNavController(navController)
+
+
     val context = LocalContext.current
     val googleSignInClient = remember {
         GoogleSignIn.getClient(
@@ -72,7 +75,16 @@ fun LoginScreen(
         }
     }
 
-    PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient,navController=navController)
+    val authState by authViewModel.authState.observeAsState()
+
+    if (authState == AuthState.Authenticated) {
+        navController.navigate("home")
+
+    } else {
+        PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient, navController = navController)
+    }
+
+   // PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient,navController=navController)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

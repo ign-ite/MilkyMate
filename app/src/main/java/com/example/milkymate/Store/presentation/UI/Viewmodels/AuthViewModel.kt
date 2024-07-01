@@ -1,5 +1,7 @@
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -21,6 +23,9 @@ class AuthViewModel : ViewModel() {
     private val _shouldNavigateToHome = MutableStateFlow<User?>(null)
     val shouldNavigateToHome: StateFlow<User?> = _shouldNavigateToHome.asStateFlow()
 
+    private val _authState = MutableLiveData<AuthState>()
+    val authState: LiveData<AuthState> = _authState
+
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
@@ -40,6 +45,7 @@ class AuthViewModel : ViewModel() {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
                 if (authResult.isSuccessful) {
+                    _authState.value= AuthState.Authenticated
                     val firebaseUser = auth.currentUser
                     val user = firebaseUser?.let {
                         User(
@@ -54,6 +60,7 @@ class AuthViewModel : ViewModel() {
                     }
                 } else {
                     // Handle error
+                    _authState.value=AuthState.Unauthenticated
                 }
             }
         }
@@ -74,13 +81,16 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun navigateToHomeScreen(user: User) {
-        if (::navController.isInitialized) {
-            val userJson = Json.encodeToString(user)
-            val encodedUser = URLEncoder.encode(userJson, "UTF-8")
-            navController.navigate("HomeScreen/$encodedUser")
-        } else {
-            Log.e("AuthViewModel", "NavController not initialized")
-        }
+    fun navigateToHomeScreen(navController: NavController, user: User) {
+        val userJson = Json.encodeToString(user)
+        val encodedUserJson = Uri.encode(userJson)
+     //   val deepLinkUri = Uri.parse("android-app://androidx.navigation/home/$encodedUserJson")
+      //  navController.navigate(deepLinkUri)
     }
+
+}
+
+enum class AuthState {
+    Authenticated,
+    Unauthenticated
 }

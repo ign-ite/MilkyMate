@@ -1,5 +1,6 @@
 package com.example.milkymate.Store.presentation.UI.Viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.milkymate.Store.model.User
@@ -13,7 +14,7 @@ class HomeScreenViewModel: ViewModel() {
     val user: StateFlow<User?> get() = _user
 
     init {
-        // Load the user data or any initial data here
+        Log.e("MilkyMateHome", "HomeScreenViewModel initialized")
     }
 
     fun setUser(user: User) {

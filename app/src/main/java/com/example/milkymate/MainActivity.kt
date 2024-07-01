@@ -21,9 +21,8 @@ class MainActivity : ComponentActivity() {
 
             MilkyMateTheme {
                 val authViewModel: AuthViewModel = viewModel()
-                val navController = rememberNavController()
 
-                NavGraph(navController = navController, authViewModel = authViewModel)
+                NavGraph(authViewModel = authViewModel)
             }
         }
         window.decorView.systemUiVisibility = (

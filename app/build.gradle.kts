@@ -108,6 +108,7 @@ dependencies {
     implementation(kotlin("script-runtime"))
     implementation (libs.kotlinx.serialization.json.v132)
 
+    implementation(libs.androidx.navigation.compose.v253)
 
 
     // Kotlin

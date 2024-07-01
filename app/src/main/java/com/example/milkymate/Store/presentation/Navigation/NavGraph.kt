@@ -12,6 +12,7 @@ import kotlinx.serialization.json.Json
 import java.net.URLDecoder
 import android.util.Log
 import androidx.navigation.NavType
+import androidx.navigation.compose.rememberNavController
 import com.example.milkymate.Store.presentation.UI.LoginScreen
 import com.example.milkymate.Store.presentation.UI.SplashScreen
 import com.example.milkymate.Store.presentation.UI.Viewmodels.HomeScreenViewModel
@@ -20,7 +21,8 @@ import java.net.URLEncoder
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
+fun NavGraph( authViewModel: AuthViewModel) {
+    val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "SplashScreen") {
         composable("SplashScreen") {
             SplashScreen(navController=navController)
@@ -45,11 +47,20 @@ fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
                     null
                 }
             }
+            var hasNavigated = false // In your login success handler
             if (user != null) {
-                navController.navigate("HomeScreen/${URLEncoder.encode(Json.encodeToString(user), "UTF-8")}")
 
-              //  HomeScreen(navController = navController, user = user, viewModel = viewModel())
-            } else {
+                Log.e("MilkyMateLogin", "Login successful, about to navigate")                 // Code to navigate to HomeScreen
+              //  navController.navigate("HomeScreen/${URLEncoder.encode(Json.encodeToString(user), "UTF-8")}")
+                HomeScreen(navController = navController, user = user, viewModel = viewModel())
+
+
+
+                //Log.e("MilkyMateLogin", "Login successful, about to navigate")  // Code to navigate to HomeScreen
+
+              //
+            }
+            else {
                 LaunchedEffect(Unit) {
                     Log.w("Navigation", "User is null, navigating back to LoginScreen")
                     navController.navigate("LoginScreen") {

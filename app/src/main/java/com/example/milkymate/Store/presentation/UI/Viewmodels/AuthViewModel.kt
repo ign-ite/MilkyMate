@@ -1,5 +1,7 @@
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
+import androidx.fragment.app.FragmentManager.TAG
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,7 +23,7 @@ import java.net.URLEncoder
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var navController: NavController
-    private val _shouldNavigateToHome = MutableStateFlow<User?>(null)
+     val _shouldNavigateToHome = MutableStateFlow<User?>(null)
 
    val shouldNavigateToHome: StateFlow<User?> = _shouldNavigateToHome.asStateFlow()
 
@@ -46,34 +48,47 @@ class AuthViewModel : ViewModel() {
         this.navController = navController
     }
 
-    fun loginWithGoogle(idToken: String) {
+    @SuppressLint("RestrictedApi")
+    fun loginWithGoogle(idToken: String?) {
         viewModelScope.launch {
-            // val auth = FirebaseAuth.getInstance()
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
-                if (authResult.isSuccessful) {
-                    _authState.value= AuthState.Authenticated
-                    val firebaseUser = auth.currentUser
-                    val user = firebaseUser?.let {
-                        User(
-                            displayName = it.displayName ?: "",
-                            photoUrl = it.photoUrl?.toString() ?: "",
-                            email = it.email ?: "",
-                            uid = it.uid
-                        )
+            idToken?.let { token ->
+                Log.d(TAG, "Attempting Google Sign-In with token: $token")
+                val credential = GoogleAuthProvider.getCredential(token, null)
+                auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
+                    if (authResult.isSuccessful) {
+                        Log.d(TAG, "Google Sign-In successful")
+                        _authState.value = AuthState.Authenticated
+                        val firebaseUser = auth.currentUser
+                        val user = firebaseUser?.let {
+                            User(
+                                displayName = it.displayName ?: "",
+                                photoUrl = it.photoUrl?.toString() ?: "",
+                                email = it.email ?: "",
+                                uid = it.uid
+                            )
+                        }
+                        if (user != null) {
+                            Log.d(TAG, " Google Sign-In with user: ${user.displayName}")
+                        }
+
+                        if (user != null) {
+                            _shouldNavigateToHome.value = user
+                        }
+                    } else {
+                        Log.e(TAG, "Google Sign-In failed: ${authResult.exception?.message}")
+                        _authState.value = AuthState.Unauthenticated
                     }
-                    if (user != null) {
-                        _shouldNavigateToHome.value = user
-                    }
-                } else {
-                    // Handle error
-                    _authState.value=AuthState.Unauthenticated
                 }
+            } ?: run {
+                Log.e(TAG, "Google ID token is null")
+                // Handle case where idToken is null (if required)
             }
         }
     }
 
-     fun com.google.firebase.auth.FirebaseUser.toUser(): User? {
+
+
+    fun com.google.firebase.auth.FirebaseUser.toUser(): User? {
         return email?.let {
             displayName?.let { it1 ->
                 photoUrl?.toString()?.let { it2 ->

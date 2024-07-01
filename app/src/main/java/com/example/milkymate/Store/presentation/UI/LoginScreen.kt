@@ -42,9 +42,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.net.URLEncoder
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel = viewModel(),
@@ -78,20 +80,20 @@ fun LoginScreen(
         }
     }
 
-  /*  val authState by authViewModel.authState.observeAsState()
-
+    val authState by authViewModel.authState.observeAsState()
+    val user = authViewModel._shouldNavigateToHome.value
     if (authState == AuthState.Authenticated) {
 
-       // HomeScreen(navController = navController, user = user, viewModel = viewModel())
-       // authViewModel.navigateToHomeScreen(navController=navController, user = )
+        if (user != null) {
+            navController.navigate("HomeScreen/${URLEncoder.encode(Json.encodeToString(user), "UTF-8")}")
+        }
+
 
     } else {
         PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient, navController = navController)
     }
 
-   */
-    PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient,navController=navController)
-
+   // PotraitLoginScreen(launcher = launcher, googleSignInClient = googleSignInClient,navController=navController)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
